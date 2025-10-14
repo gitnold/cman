@@ -13,8 +13,8 @@ inline namespace v1 {
     Parser::Parser(std::vector<cman::Option> options) {
         //TODO: save the project name somewhere.
         this->options = options;
-        ErrorType status = get_optiontypes();
-        if (status == ErrorType::OK) {
+        ResultType status = get_optiontypes();
+        if (status == ResultType::OK) {
             construct_hash();
             evaluate();
         }
@@ -28,7 +28,7 @@ inline namespace v1 {
     }
     
     //FIX: abort when an illegal option is encountered.
-    ErrorType Parser::get_optiontypes() {
+    ResultType Parser::get_optiontypes() {
         for (Option option: this->options) {
             //HACK: design a custom viewer fucntion to visualize the pipeline.
             //debug line below
@@ -40,20 +40,18 @@ inline namespace v1 {
                     this->project_name = option.value;
                 }
             } else {
-                return ErrorType::ILLEGAL;
+                return ResultType::ILLEGAL;
             }
         }
-        return ErrorType::OK;
+        return ResultType::OK;
     }
     
     //TODO: do sth like a result type for this function for error handling.
-    ErrorType Parser::construct_hash() {
-        //FIX: use sth that preserves the order e.g bitmasks
-        //2nd option: use strings and compare them.
+    ResultType Parser::construct_hash() {
         std::string hash_str;
 
         if (this->tokens.empty()) {
-            return ErrorType::EMPTY_TOKEN;
+            return ResultType::EMPTY_TOKEN;
 
         }
         //HACK: try byte arrays for speed up.
@@ -62,25 +60,23 @@ inline namespace v1 {
             // hash += static_cast<int>(token);
         }
         this->hash = {.value = hash_str};
-        return ErrorType::OK;
+        return ResultType::OK;
     }
 
     //NOTE: find a better altenative to branching, like a hashmap.
-    ErrorType Parser::evaluate() {
+    ResultType Parser::evaluate() {
         
         std::println("Hash value {}", this->hash.value);
         
-        //FIX: hashing below problematic.
         if (this->hash.value.compare("03") == 0) {
-            //FIX: capture the project name.
             cman::initialize_newbin_project(this->project_name);
             cman::initialize_git();
 
         } else if (this->hash.value.compare("04") == 0) {
-            return ErrorType::UNIMPLEMENTED;
+            return ResultType::UNIMPLEMENTED;
 
         } else if (this->hash.value.compare("034") == 0) {
-            return ErrorType::UNIMPLEMENTED;
+            return ResultType::UNIMPLEMENTED;
 
         } else if (this->hash.value.compare("23") == 0) {
             cman::initialize_current_dir();
@@ -99,10 +95,10 @@ inline namespace v1 {
             cman::initialize_newbin_project(this->project_name);
 
         } else {
-            return ErrorType::ILLEGAL_FORMAT;
+            return ResultType::ILLEGAL_FORMAT;
         }
 
-        return ErrorType::OK;
+        return ResultType::OK;
     }
     
 }}

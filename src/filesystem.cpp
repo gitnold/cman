@@ -5,7 +5,6 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
-#include <string_view>
 #include <system_error>
 #include <unistd.h>
 #include "../include/style.h"
@@ -22,7 +21,9 @@ inline namespace v1 {
     void initialize_git() {
         //TODO: hide this error or format for the user.
         int check_git = std::system("git --version");
+
         if (WEXITSTATUS(check_git) == 0) {
+            //FIX: initialize_git in the bin project folder for --new option.
             int git_repo = system("git init");
             std::string git_ignore {"bin\ndebug\nassets\n"};
             
@@ -30,7 +31,7 @@ inline namespace v1 {
             std::ofstream gitfile (".gitignore");
     
             if (!gitfile) {
-                print_message("Error opening file", WARNING);
+                print_message("Error opening file", ERROR);
                 return;
             }
 
@@ -52,12 +53,39 @@ inline namespace v1 {
         print_message("Creating a new binary project", DEBUG);
         for (std::string dir : dirs) {
             fs::create_directories("./" + project_name + "/" + dir, err);
+            
             if (err.value() != 0) {
                 print_message(err.message().c_str(), ERROR);
                 return EXIT_FAILURE;
+
             } else {
                 std::string message {"Creating " + dir + " directory..."};
                 print_message(message.c_str(), INFO);
+            
+            }
+        }
+        //TODO: generate a main.cpp file and put some boilerplate code.
+        return EXIT_SUCCESS;
+    }
+
+    //overloaded nebin function.
+    int initialize_newbin_project() {
+        std::array<std::string, 4> dirs { "bin", "include", "src", "debug"};
+        std::error_code err;
+        
+        //FIX: check if the directories exist.
+        print_message("Creating a new binary project", DEBUG);
+        for (std::string dir : dirs) {
+            fs::create_directories("./" + dir, err);
+
+            if (err.value() != 0) {
+                print_message(err.message().c_str(), ERROR);
+                return EXIT_FAILURE;
+
+            } else {
+                std::string message {"Creating " + dir + " directory..."};
+                print_message(message.c_str(), INFO);
+
             }
         }
         //TODO: generate a main.cpp file and put some boilerplate code.
@@ -66,11 +94,17 @@ inline namespace v1 {
 
     void initialize_current_dir() {
         //get the current working directory.
-        std::string current_dir = fs::current_path().filename();
-        int status = initialize_newbin_project(current_dir);
+        std::string current_dir = fs::current_path();
+        int status = initialize_newbin_project();
         if (status == EXIT_FAILURE) return;
 
         print_message("Modyfying current directory", DEBUG);
+
+        if (!fs::exists(current_dir)) {
+            //TODO: change print_message to accept formatted strings.
+            print_message("Current directory does not exist!",  ERROR);
+            return;
+        }
         
         //TODO: try to detect bash build scripts, makefiles and cmake files.
         try {

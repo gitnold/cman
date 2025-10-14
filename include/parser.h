@@ -10,7 +10,7 @@ namespace cman {
         struct Hash {
             std::string value;
         };
-        enum class ErrorType {
+        enum class ResultType {
             ILLEGAL,
             EMPTY_TOKEN,
             ILLEGAL_FORMAT,
@@ -30,9 +30,9 @@ namespace cman {
                 ~Parser();
 
             private:
-                ErrorType get_optiontypes();
-                ErrorType construct_hash();
-                ErrorType evaluate();
+                ResultType get_optiontypes();
+                ResultType construct_hash();
+                ResultType evaluate();
         };
     }
 }

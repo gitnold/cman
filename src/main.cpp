@@ -5,8 +5,6 @@
 #include <print>
 #include <string_view>
 
-//TODO: modify the helper message below.
-//TODO: add support for git initialization only i.e cman --git
 
 namespace cman {
 inline namespace v1 {
@@ -16,7 +14,6 @@ inline namespace v1 {
 }}
 
 void cman::print_help() {
-    //FIX: consinder creating a helper fucntion.
     printf("%sWelcome to C package manager ^_^%s\n", BLUE, RESET);
     printf("%sUsage :%s\n", BLUE, RESET);
     cman::add_cli_option("--new <project_name>  ::  create a new project in the new directory 'project_name'");
@@ -43,7 +40,6 @@ void cman::print_message(const char *message, cman::MessageType type) {
     }
 }
 
-//FIX: everything seems to initialize a new binary project contrary to expected behaviour.
 int main(int argc, char** argv) {
 
     //launch the cli argument parser.
@@ -57,9 +53,4 @@ int main(int argc, char** argv) {
     return EXIT_SUCCESS; 
 }
 
-//CHECKLIST.
-//NOTE: git initialization works
-//NOTE: cman --new <project name> works -- not anymore hahaha
-//NOTE: hashing seems to work as intended.
-//-h flag is fucking bonkers!!!! - does its own shit.
 
