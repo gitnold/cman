@@ -10,6 +10,7 @@
 #include "../include/style.h"
 
 //TODO: add robust error handling.
+//TODO: remove copied files.
 //TODO: add checks to prevent reinitialization of existing projects.
 
 //NOTE: add support fpr reorganizing current projects.
@@ -45,6 +46,7 @@ inline namespace v1 {
     }
     
     //TODO: overload function below or add a switch case to avoid code repetition.
+    //TODO: generate a main.cpp with hello from <project name>, and a buil.sh
     int initialize_newbin_project(std::string project_name) {
         std::array<std::string, 4> dirs { "bin", "include", "src", "debug"};
         std::error_code err;

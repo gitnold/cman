@@ -53,4 +53,6 @@ int main(int argc, char** argv) {
     return EXIT_SUCCESS; 
 }
 
+//NOTE: consinder adding a '--run and --build' option.
+
 
