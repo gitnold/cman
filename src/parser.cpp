@@ -2,7 +2,7 @@
 #include "../include/parser.h"
 #include "../include/filesystem.h"
 #include "../include/style.h"
-#include <print>
+// #include <print>
 #include <string>
 #include <vector>
 
@@ -32,7 +32,7 @@ inline namespace v1 {
         for (Option option: this->options) {
             //HACK: design a custom viewer fucntion to visualize the pipeline.
             //debug line below
-            std::println("Option type->{} : option value->{}",static_cast<int>(option.type), option.value);
+            // std::println("Option type->{} : option value->{}",static_cast<int>(option.type), option.value);
 
             if (option.type != cman::OptionType::ILLEGAL) {
                 this->tokens.push_back(option.type);
@@ -66,7 +66,7 @@ inline namespace v1 {
     //NOTE: find a better altenative to branching, like a hashmap.
     ResultType Parser::evaluate() {
         
-        std::println("Hash value {}", this->hash.value);
+        // std::println("Hash value {}", this->hash.value);
         
         if (this->hash.value.compare("03") == 0) {
             cman::initialize_newbin_project(this->project_name);
