@@ -1,0 +1,5 @@
+- [x] Support existing code directories.
+- [x] Add git tracking
+- [ ] Add build caches.
+- [ ] Bootstrapped updates/self builds.
+- [ ] Possibly add dependency managemant 
