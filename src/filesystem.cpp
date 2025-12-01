@@ -14,6 +14,7 @@
 //TODO: add checks to prevent reinitialization of existing projects.
 
 //NOTE: add support fpr reorganizing current projects.
+//HACK: populate the hashmap with last access times on project initialization.
 
 namespace fs = std::filesystem;
 
@@ -21,11 +22,12 @@ namespace cman {
 inline namespace v1 {
     void initialize_git() {
         //TODO: hide this error or format for the user.
-        int check_git = std::system("git --version");
+        //TODO: pipe output below to dev/null.
+        int check_git = std::system("git --version > /dev/null");
 
         if (WEXITSTATUS(check_git) == 0) {
             //FIX: initialize_git in the bin project folder for --new option.
-            int git_repo = system("git init");
+            int git_repo = system("git init > /dev/null");
             std::string git_ignore {"bin\ndebug\nassets\n"};
             
             //TODO: wrap logic below in a try block.

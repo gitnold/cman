@@ -46,6 +46,7 @@ inline namespace v1 {
 
     Option Config::check_arg(const char* arg,  char* value) {
         //TODO: add support for --git, --lib, --bin etc.
+        //TODO: add support for -- for passing cli options to the resulting binary.
         std::string value_new;
         if (value == nullptr) {
             value_new = "";
@@ -61,10 +62,15 @@ inline namespace v1 {
         } else if (option.compare("--git") == 0) {
             return make_option(OptionType::GIT, value_new);
 
-        }else if (option.compare("--init") == 0) {
+        } else if (option.compare("--init") == 0) {
             //check that value is not null.
             return make_option(OptionType::INIT, value_new);
+        } else if (option.compare("--run") == 0) {
+            return make_option(OptionType::RUN, value_new);
             
+        } else if (option.compare("--build") == 0) {
+            return make_option(OptionType::BUILD, value_new);
+
         } else if (option.compare("--new") == 0) {
             //TODO: check if value is empty before making option.
             //FIX: new cannot have an empty value, abort if null.
@@ -123,6 +129,20 @@ inline namespace v1 {
             case cman::OptionType::LIB:
                 return (Option) {
                     .type = OptionType::LIB,
+                    .value = value
+                };
+                break;
+
+            case cman::OptionType::RUN:
+                return (Option) {
+                    .type = OptionType::RUN,
+                    .value = value
+                };
+                break;
+
+            case cman::OptionType::BUILD:
+                return (Option) {
+                    .type = OptionType::BUILD,
                     .value = value
                 };
                 break;

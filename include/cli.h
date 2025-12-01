@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+// maybe deprecated.
 #define MAX_OPTIONS 3
 
 namespace cman {
@@ -15,6 +16,8 @@ inline namespace v1 {
         INIT,
         GIT,
         LIB,
+        RUN,
+        BUILD,
         ILLEGAL
     };
 

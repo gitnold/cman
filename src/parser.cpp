@@ -5,6 +5,7 @@
 // #include <print>
 #include <string>
 #include <vector>
+#include "../include/build.h"
 
 //FIX: fis the hashing its non-deterministic.
 
@@ -26,7 +27,7 @@ inline namespace v1 {
     Parser::~Parser() {
         //do nothing.
     }
-    
+
     //FIX: abort when an illegal option is encountered.
     ResultType Parser::get_optiontypes() {
         for (Option option: this->options) {
@@ -45,7 +46,7 @@ inline namespace v1 {
         }
         return ResultType::OK;
     }
-    
+
     //TODO: do sth like a result type for this function for error handling.
     ResultType Parser::construct_hash() {
         std::string hash_str;
@@ -65,9 +66,10 @@ inline namespace v1 {
 
     //NOTE: find a better altenative to branching, like a hashmap.
     ResultType Parser::evaluate() {
-        
+
         // std::println("Hash value {}", this->hash.value);
-        
+        // FIX: for `--init` options set project_name to current directory.
+
         if (this->hash.value.compare("03") == 0) {
             cman::initialize_newbin_project(this->project_name);
             cman::initialize_git();
@@ -83,7 +85,7 @@ inline namespace v1 {
             //FIX: overload or fix git + init variants where project is current directory.
             cman::initialize_git();
 
-        } else if (this->hash.value.compare("1") == 0) {
+        } else if (this->hash.value.compare("1") == 0 || this->hash.value.empty()) {
             //print help.
             cman::print_message("Printing help", INFO);
             cman::print_help();
@@ -94,11 +96,21 @@ inline namespace v1 {
         } else if (this->hash.value.compare("0") == 0) {
             cman::initialize_newbin_project(this->project_name);
 
+        // --run option.
+        } else if (this->hash.value.compare("5") == 0) {
+            //cman::run(this->project_name);
+
+        //--build option
+        } else if (this->hash.value.compare("6") == 0) {
+            //cman::build();
+
+        //TODO: add hash values for --run and --build options.
+        //can only be standalone not other combinations.
         } else {
             return ResultType::ILLEGAL_FORMAT;
         }
 
         return ResultType::OK;
     }
-    
+
 }}

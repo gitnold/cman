@@ -6,11 +6,13 @@
 #include <string_view>
 
 
+//HACK: use a macro to define a debug control mode - use g++ -DEBUG to toggle debug mode.
+
 namespace cman {
 inline namespace v1 {
     void add_cli_option(std::string_view option) {
         std::println("{}\t{}{}",GREEN, option, RESET);
-    }   
+    }
 }}
 
 void cman::print_help() {
@@ -19,6 +21,8 @@ void cman::print_help() {
     cman::add_cli_option("--new <project_name>  ::  create a new project in the new directory 'project_name'");
     cman::add_cli_option("--init                ::  organize current working directory");
     cman::add_cli_option("--git                 ::  start a local repository in the project root");
+    cman::add_cli_option("--build               ::  build the current project");
+    cman::add_cli_option("--run                 ::  run built binary, builds the projects if any changes were made");
 }
 
 void cman::print_message(const char *message, cman::MessageType type) {
@@ -40,19 +44,24 @@ void cman::print_message(const char *message, cman::MessageType type) {
     }
 }
 
-int main(int argc, char** argv) {
+//TODO: how cargo detects file changes.
 
+int main(int argc, char** argv) {
+    //NOTE: consinder adding a cman::init() pattern.
     //launch the cli argument parser.
     auto cli = cman::Config(argv, argc);
     cli.parse();
-    
+
     //launch the evaluator.
     auto parser = cman::Parser(cli.options);
 
 
-    return EXIT_SUCCESS; 
+    return EXIT_SUCCESS;
 }
 
+//TODO: add detection to ensure some operations are ran in the correct location e.g project root.
+
 //NOTE: consinder adding a '--run and --build' option.
+//allow sb to configure paths to use.
 
-
+//NOTE: consinder having animations e.g fro progress tracking.
