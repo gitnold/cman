@@ -3,8 +3,8 @@ debug
 assets
 tests
 LICENSE
-build*
-ast*
+#build*
+#ast*
 lib
 
 
