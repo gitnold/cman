@@ -62,6 +62,7 @@ int main(int argc, char** argv) {
 //TODO: add detection to ensure some operations are ran in the correct location e.g project root.
 
 //NOTE: consinder adding a '--run and --build' option.
-//allow sb to configure paths to use.
+//allow sb to configure paths to use
+//support for compile_commands.json
 
-//NOTE: consinder having animations e.g fro progress tracking.
+//NOTE: consinder having animations e.g for progress tracking.

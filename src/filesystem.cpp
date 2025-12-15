@@ -111,6 +111,7 @@ inline namespace v1 {
         }
         
         //TODO: try to detect bash build scripts, makefiles and cmake files.
+        //TODO: create a hashmap of trackable files.
         try {
             for (const auto& entry : fs::directory_iterator(current_dir)) {
                 //TODO: add a loading animation for process below.
@@ -118,14 +119,14 @@ inline namespace v1 {
                     fs::path extension = entry.path().extension();
                     auto perms = entry.status().permissions();
 
-                    if (extension == ".h") {
+                    if (extension == ".h" || extension == ".hpp") {
                         //copy files to include directory.
                         fs::copy(entry.path(), "./include/");
 
-                    //TODO: add support for other c++ file extensions
-                    } else if (extension == ".cpp" || extension == ".c") {
+                    //TODO: check for case edge cases.
+                    } else if (extension == ".cpp" || extension == ".c" || extension == ".cxx" || extension == ".cc") {
                         //copy files to src directory..
-                        fs::copy(entry.path(), "./src/");
+                        fs::copy(entry.path(), "./src/"); 
                     
                     } else if ((perms & fs::perms::others_exec) != fs::perms::none ||
                             (perms & fs::perms::group_exec) != fs::perms::none ||
