@@ -1,7 +1,7 @@
 //NOTE: abort immediately you encounter an illegal token, no need to continue.
-#include "../include/parser.h"
-#include "../include/filesystem.h"
-#include "../include/style.h"
+#include "parser.h"
+#include "filesystem.h"
+#include "style.h"
 // #include <print>
 #include <string>
 #include <vector>

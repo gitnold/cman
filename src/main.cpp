@@ -1,6 +1,6 @@
-#include "../include/cli.h"
-#include "../include/parser.h"
-#include "../include/style.h"
+#include "cli.h"
+#include "parser.h"
+#include "style.h"
 #include <cstdlib>
 #include <print>
 #include <string_view>
@@ -66,3 +66,4 @@ int main(int argc, char** argv) {
 //support for compile_commands.json
 
 //NOTE: consinder having animations e.g for progress tracking.
+// add 'bear' support or use it as dependency.

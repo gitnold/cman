@@ -1,4 +1,4 @@
-#include "../include/filesystem.h"
+#include "filesystem.h"
 #include <array>
 #include <cstdlib>
 #include <fstream>
@@ -7,7 +7,7 @@
 #include <string>
 #include <system_error>
 #include <unistd.h>
-#include "../include/style.h"
+#include "style.h"
 
 //TODO: add robust error handling.
 //TODO: remove copied files.

@@ -6,5 +6,7 @@ LICENSE
 #build*
 #ast*
 lib
+.cache
+compile_commands.json
 
 

@@ -1,6 +1,6 @@
-#include "../include/build.h"
-#include "../include/style.h"
-#include "../lib/json.hpp"
+#include "build.h"
+#include "style.h"
+#include "json.hpp"
 #include <cstdlib>
 #include <expected>
 #include <filesystem>
@@ -79,7 +79,7 @@ inline namespace v1 {
     //FIX: construct the hashmap from json correctly.
     void FileStates::load_json() {
         nlohmann::json json_obj;
-        this->access_times = json_obj;
+        //this->access_times = json_obj;
     }
 
     void FileStates::dump_state_to_json() {

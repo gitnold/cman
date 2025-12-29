@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <string>
-#include "../include/cli.h"
+#include "cli.h"
 
 namespace cman {
 inline namespace v1 {
