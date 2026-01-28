@@ -13,12 +13,19 @@ A tool to manage c and C++ projects built to learn C++.
 
 Only POSIX compliant systems supported, but tested on a linux environment only.
 
-1. Clone the repository and run the following.
+1. Clone the repository and run one of the following(assuming there is a bin directory already).
 
 ```bash
 //compile script at the project root.
 $ chmod +x build.sh
 $ ./build.sh
+```
+
+```bash
+//Compile script in the bin folder
+$ cmake -G "Unix Makefiles" .. # Run once or change the string if not on linux
+$ cmake --build . # Or just 'make', but might fail
+$ ./cman
 ```
 
 **cross platform functionality and more Installation options to be added in time**
