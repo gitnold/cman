@@ -1,0 +1,8 @@
+// cman config file.
+// holds the global attributes and settings necessary for cman to work correctly.
+{
+    "name" : "cman",
+    "version" : 0.1,
+    "bin path" : "~/Applications/",
+    "config-path" : "~/.config/cman/cman.json",
+}

@@ -1,10 +1,13 @@
 #ifndef CMAN_BUILD_H
 #define CMAN_BUILD_H
 
+#include "cli.h"
 #include <expected>
+#include <string>
 #include <string_view>
 #include <filesystem>
 #include <unordered_map>
+#include <vector>
 
 namespace fs = std::filesystem;
 
@@ -32,24 +35,40 @@ inline namespace v1 {
         RELEASE,
         DEFAULT
     };
+    enum class Lang {
+        C,
+        CPP
+    };
 
     //storage for various build configurations.
     // possible storage overhead.
+    // make fields like BuildType private but expose various constructors that set them under the hood.
+    // have separate bin paths based on buildmode i.e targets
+    //
+    // TODO: capture project path on initialization for use in various stuff.
     struct BuildConfig{
         BuildType build;
         std::string bin_path;
         BuildMode mode;
+        std::string project_name;
+        std::string project_path;
+        Lang language;
+        std::vector<std::string> arguments;
     };
+
+    // global state to handle build details
+    // TODO: remove inline def below, opt for references. 
+    // inline BuildConfig Config;
 
     //acts like a "main" function for build.cpp taking away build logic from the parser stage.
     // TODO: have sth like a state variable that denotes what build system is set. Integrate with build.c later
     // HACK: consinder having a config json file.
-    void build();
+    void build(const BuildConfig& config);
 
     //runs the compiled binary.
     void run(std::string_view project_name);
     void generate_build_sh();
-    void compile_bash();
+    bool compile_bash();
     void compile_make();
 
     //TODO: find the best place to store the file path.

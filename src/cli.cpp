@@ -5,10 +5,11 @@
 
 namespace cman {
 inline namespace v1 {
-    Config::Config(char** args,int number) {
+    Config::Config(char** args,int number){
         this->args = args;
         this->num_of_args = number;
         this->package_name = "Cman";
+
         //this->options {}; //TODO: how to declare an empty vector without initializing
 
     }
@@ -24,8 +25,8 @@ inline namespace v1 {
             //FIX: skip first arg as its the program itself.
             //TODO: return the options to the user on instantiating the cli parser.
             //FIX: logic below causes segfaults why??
-
-            //this->options.push_back(check_arg(this->args[i], this->args[i+1]));
+            
+            this->options.push_back(check_arg(this->args[i], this->args[i+1]));
             const char* current = this->args[i];
             char* next = (i + 1 < this->num_of_args) ? this->args[i + 1] : nullptr;
 
@@ -45,8 +46,9 @@ inline namespace v1 {
     }
 
     Option Config::check_arg(const char* arg,  char* value) {
-        //TODO: add support for --git, --lib, --bin etc.
+        //TODO: add support for -v or --version
         //TODO: add support for -- for passing cli options to the resulting binary.
+        //Find whether a trie is more efficient for the giant if else toggle below.
         std::string value_new;
         if (value == nullptr) {
             value_new = "";
@@ -56,7 +58,10 @@ inline namespace v1 {
 
         std::string_view option {arg};
 
-        if (option.compare("-h") == 0) {
+        if (option.compare("-h") || option.compare("--help")) {
+            return make_option(OptionType::HELP, value_new);
+
+        } else if (option.compare("-v") || option.compare("--version")) {
             return make_option(OptionType::HELP, value_new);
 
         } else if (option.compare("--git") == 0) {
@@ -72,12 +77,18 @@ inline namespace v1 {
             return make_option(OptionType::BUILD, value_new);
 
         } else if (option.compare("--new") == 0) {
-            //TODO: check if value is empty before making option.
-            //FIX: new cannot have an empty value, abort if null.
-            if (value_new.empty() == true) {
-                return make_option(OptionType::ILLEGAL, "--new cannot have a n empty project name");
-            }
             return make_option(OptionType::NEW, value_new);
+
+        } else if (option.compare("--lang") == 0) {
+            return make_option(OptionType::LANGUAGE, value_new);
+
+        } else if (option.compare("--update")) {
+            return make_option(OptionType::UPDATE, value_new);
+        
+        } else if (option.compare("--mode")){
+            return make_option(OptionType::MODE, value_new);
+        } else if (option.compare("--")) {
+            return make_option(OptionType::CLI_ARGS, value_new);
 
         } else if (option.empty() == true) {
             return make_option(OptionType::HELP, "print help");
@@ -143,6 +154,42 @@ inline namespace v1 {
             case cman::OptionType::BUILD:
                 return (Option) {
                     .type = OptionType::BUILD,
+                    .value = value
+                };
+                break;
+
+            case cman::OptionType::LANGUAGE:
+                return (Option) {
+                    .type = OptionType::LANGUAGE,
+                    .value = value
+                };
+                break;
+            
+            case cman::OptionType::UPDATE:
+                return (Option) {
+                    .type = OptionType::UPDATE,
+                    .value = value
+                };
+                break;
+            
+
+            case cman::OptionType::MODE:
+                return (Option) {
+                    .type = OptionType::MODE,
+                    .value = value
+                };
+                break;
+            
+            case cman::OptionType::VERSION:
+                return (Option) {
+                    .type = OptionType::VERSION,
+                    .value = value
+                };
+                break;
+
+            case cman::OptionType::CLI_ARGS:
+                return (Option) {
+                    .type = OptionType::CLI_ARGS,
                     .value = value
                 };
                 break;

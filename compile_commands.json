@@ -1,0 +1,87 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-Wall",
+      "-Wextra",
+      "-Iinclude",
+      "-Ilib",
+      "-o",
+      "bin/dev/cman",
+      "./src/build.cpp"
+    ],
+    "directory": "/home/fednold/coding/dev/cman",
+    "file": "/home/fednold/coding/dev/cman/src/build.cpp",
+    "output": "/home/fednold/coding/dev/cman/bin/dev/cman"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-Wall",
+      "-Wextra",
+      "-Iinclude",
+      "-Ilib",
+      "-o",
+      "bin/dev/cman",
+      "./src/cli.cpp"
+    ],
+    "directory": "/home/fednold/coding/dev/cman",
+    "file": "/home/fednold/coding/dev/cman/src/cli.cpp",
+    "output": "/home/fednold/coding/dev/cman/bin/dev/cman"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-Wall",
+      "-Wextra",
+      "-Iinclude",
+      "-Ilib",
+      "-o",
+      "bin/dev/cman",
+      "./src/filesystem.cpp"
+    ],
+    "directory": "/home/fednold/coding/dev/cman",
+    "file": "/home/fednold/coding/dev/cman/src/filesystem.cpp",
+    "output": "/home/fednold/coding/dev/cman/bin/dev/cman"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-Wall",
+      "-Wextra",
+      "-Iinclude",
+      "-Ilib",
+      "-o",
+      "bin/dev/cman",
+      "./src/main.cpp"
+    ],
+    "directory": "/home/fednold/coding/dev/cman",
+    "file": "/home/fednold/coding/dev/cman/src/main.cpp",
+    "output": "/home/fednold/coding/dev/cman/bin/dev/cman"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-Wall",
+      "-Wextra",
+      "-Iinclude",
+      "-Ilib",
+      "-o",
+      "bin/dev/cman",
+      "./src/parser.cpp"
+    ],
+    "directory": "/home/fednold/coding/dev/cman",
+    "file": "/home/fednold/coding/dev/cman/src/parser.cpp",
+    "output": "/home/fednold/coding/dev/cman/bin/dev/cman"
+  }
+]

@@ -2,6 +2,8 @@
 #define CMAN_PARSER_H
 
 #include "cli.h"
+#include <optional>
+#include <string>
 #include <vector>
 
 
@@ -17,15 +19,32 @@ namespace cman {
             UNIMPLEMENTED,
             OK
         };
+
+        struct ParsedInput {
+            bool has_help = false;
+            std::optional<std::string> project_name;
+            std::optional<std::string> language;
+            bool init_dir = false;
+            bool init_git = false;
+            bool init_project = false;
+            bool build_project = false;
+            bool run_bin = false;
+            std::optional<std::string> bin_args;
+            
+        };        
+
         //TODO: repetitive logic below.
         class Parser {
             public:
                 //HACK: have a hashmap where the key is optiontype to the option struct?
                 std::vector<cman::Option> options;
                 std::vector<cman::OptionType> tokens;
+                ParsedInput parse_result;
                 std::string project_name;
                 Hash hash;
-                Hash parse();
+                
+                // TODO: take in the context as a const to avoid modifying it.
+                ResultType parse();
                 Parser(std::vector<cman::Option> options);
                 ~Parser();
 

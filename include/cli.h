@@ -18,21 +18,28 @@ inline namespace v1 {
         LIB,
         RUN,
         BUILD,
+        LANGUAGE,
+        UPDATE,
+        MODE,
+        VERSION,
+        CLI_ARGS,
         ILLEGAL
     };
 
-    //TODO: try using a union for optional values types.
     struct Option {
         OptionType type;
         std::string value;  //try using unions for non-values params.
     };
+
 
     class Config {
         public:
             char** args;
             int num_of_args;
             std::string package_name;
+
             std::vector<Option> options;
+
             Config(char** args, int number);
             void parse();
             ~Config();

@@ -1,12 +1,4 @@
 bin
 debug
 assets
-tests
-LICENSE
-#build*
-#ast*
-lib
-.cache
-compile_commands.json
-
 

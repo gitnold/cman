@@ -7,7 +7,10 @@
 #include <string>
 #include <system_error>
 #include <unistd.h>
+#include "cli.h"
 #include "style.h"
+#include "build.h"
+#include "utils/config_templates.h"
 
 //TODO: add robust error handling.
 //TODO: remove copied files.
@@ -22,12 +25,11 @@ namespace cman {
 inline namespace v1 {
     void initialize_git() {
         //TODO: hide this error or format for the user.
-        //TODO: pipe output below to dev/null.
         int check_git = std::system("git --version > /dev/null");
 
         if (WEXITSTATUS(check_git) == 0) {
             //FIX: initialize_git in the bin project folder for --new option.
-            int git_repo = system("git init > /dev/null");
+            [[maybe_unused]]int git_repo = system("git init > /dev/null");
             std::string git_ignore {"bin\ndebug\nassets\n"};
             
             //TODO: wrap logic below in a try block.
@@ -44,11 +46,11 @@ inline namespace v1 {
 
             print_message("Successfully written to .gitignore", DEBUG);
         }
-
+        
     }
     
     //TODO: overload function below or add a switch case to avoid code repetition.
-    //TODO: generate a main.cpp with hello from <project name>, and a buil.sh
+    //TODO: generate a main.cpp with hello from <project name>, and a build.sh
     int initialize_newbin_project(std::string project_name) {
         std::array<std::string, 4> dirs { "bin", "include", "src", "debug"};
         std::error_code err;
@@ -68,7 +70,22 @@ inline namespace v1 {
             
             }
         }
-        //TODO: generate a main.cpp file and put some boilerplate code.
+        //generate a main.cpp/main.c file and put some boilerplate code.
+        std::string mainfile {""};
+        // FIX: move to a reference, avoid the global config struct.
+        switch (Config.language) {
+            case cman::Lang::CPP:
+                mainfile = ("./" + project_name + "/src/main.c");
+                break;
+            case cman::Lang::C:
+                mainfile = ("./" + project_name + "/src/main.cpp");
+                break;
+            default:
+                print_message("Unsuppported Language specified", ERROR);
+        }
+        std::ofstream main_file(mainfile);
+        main_file << utils::hello_world(project_name, Config.language);
+        main_file.close();
         return EXIT_SUCCESS;
     }
 
@@ -102,7 +119,7 @@ inline namespace v1 {
         int status = initialize_newbin_project();
         if (status == EXIT_FAILURE) return;
 
-        print_message("Modyfying current directory", DEBUG);
+        print_message("Modifying current directory", DEBUG);
 
         if (!fs::exists(current_dir)) {
             //TODO: change print_message to accept formatted strings.
@@ -111,7 +128,7 @@ inline namespace v1 {
         }
         
         //TODO: try to detect bash build scripts, makefiles and cmake files.
-        //TODO: create a hashmap of trackable files.
+        //TODO: create a hashmap of trackable files. WTH??
         try {
             for (const auto& entry : fs::directory_iterator(current_dir)) {
                 //TODO: add a loading animation for process below.

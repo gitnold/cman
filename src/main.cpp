@@ -43,7 +43,6 @@ void cman::print_message(const char *message, cman::MessageType type) {
             printf("%sWrite a default fallback%s\n",RED, RESET);
     }
 }
-
 //TODO: how cargo detects file changes.
 
 int main(int argc, char** argv) {
@@ -54,16 +53,22 @@ int main(int argc, char** argv) {
 
     //launch the evaluator.
     auto parser = cman::Parser(cli.options);
-
+   
+    //if parser returns a non-okay status, return failure, leave details to the semantic analysis.
+    // NOTE: pissible logic bug below.
+    if (parser.parse() != cman::ResultType::OK) {
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }
 
+// TODO: IMPORTANT: switch to an action tree asap.
 //TODO: add detection to ensure some operations are ran in the correct location e.g project root.
-
-//NOTE: consinder adding a '--run and --build' option.
-//allow sb to configure paths to use
-//support for compile_commands.json
+//TODO: do i need a rest api for the cman registry.
+//NOTE: allow sb to configure paths to use
+//NOTE: support for compile_commands.json
 
 //NOTE: consinder having animations e.g for progress tracking.
 // add 'bear' support or use it as dependency.
+// add support for self update and self install
