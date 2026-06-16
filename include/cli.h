@@ -1,11 +1,21 @@
 #ifndef CLI_PARSER_H
 #define CLI_PARSER_H
 
+#include "json.hpp"
+#include <filesystem>
+#include <optional>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 // maybe deprecated.
 #define MAX_OPTIONS 3
+
+namespace fs = std::filesystem;
+
+// NOTE: have a unified/flexible config style that allows cross referencing.
+// allow more features via the config files, add supoort for manual cli arguments 
+// overrides later.
 
 namespace cman {
 inline namespace v1 {
@@ -23,6 +33,7 @@ inline namespace v1 {
         MODE,
         VERSION,
         CLI_ARGS,
+        BUILD_TYPE,
         ILLEGAL
     };
 
@@ -31,24 +42,48 @@ inline namespace v1 {
         std::string value;  //try using unions for non-values params.
     };
 
+    enum class LexMode {
+        CLI,
+        JSON
+    };
+
+    // TODO: consinder changing the value to std::optional.
+    inline  std::unordered_map<std::string, Option> known_options = {
+      {"--new", {OptionType::NEW, ""}},
+      {"--help", {OptionType::HELP, ""}},
+      {"--init", {OptionType::INIT, ""}},
+      {"--git", {OptionType::GIT, ""}},
+      {"--lib", {OptionType::LIB, ""}},
+      {"--run",{OptionType::RUN, ""}},
+      {"--build", {OptionType::BUILD, ""}},
+      {"--lang", {OptionType::LANGUAGE, ""}},
+      {"--update", {OptionType::UPDATE, ""}},
+      {"--mode", {OptionType::MODE, ""}},
+      {"--version", {OptionType::VERSION, ""}},
+      {"--", {OptionType::CLI_ARGS,""}},
+    };
+
+    std::optional<fs::path> find_local_config(fs::path start);
 
     class Config {
         public:
             char** args;
             int num_of_args;
             std::string package_name;
-
+            nlohmann::json global_config;
+            nlohmann::json local_config;
             std::vector<Option> options;
 
-            Config(char** args, int number);
+            Config(char** args, int number, LexMode mode);
             void parse();
             ~Config();
 
         private:
+            bool parse_config();
             Option make_option(OptionType type, std::string value);
             Option check_arg(const char* arg, char* value);
-            
+            Option check_arg_map(const char* arg, char* value);
+
     };
 }}
 #endif // !CLI_PARSER_H
-

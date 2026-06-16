@@ -22,7 +22,7 @@ inline namespace v1 {
         //TODO: store the target version somewhere for reference.
         const std::string LINUX_BIN_PATH {"~/.local/bin/"};
         const std::string WINDOWS_BIN_PATH {"windows equivalent"};
-        const std::string CONFIG_FILE {"~/.comfig/cman/cman.json"};
+        const std::string GLOBAL_CONFIG_FILE {"~/.config/cman/cman.json"};
         
         inline const std::string github_repo {"https://github.com/gitnold/cman.git"};
         inline SelfUpdate UpdateConfig{

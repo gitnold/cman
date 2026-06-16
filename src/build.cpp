@@ -1,5 +1,5 @@
 #include "build.h"
-#include "cli.h"
+// #include "cli.h"
 #include "style.h"
 #include "json.hpp"
 #include <cstdlib>
@@ -22,15 +22,15 @@ namespace fs = std::filesystem;
 //cmake = command execution no custom logic.
 namespace cman {
 inline namespace v1 {
-    //if nothing has changed then run binary else compile first. 
+    //if nothing has changed then run binary else compile first.
     void run(std::string_view project_name) {
-        
+
         std::system(std::format("$BIN/{}", project_name).c_str());
     }
 
     //FIX: possible lifetime issue with using a reference.
     void build(const BuildConfig& config) {
-        
+
         // try to move into the project root first before trying to build the project.
         try {
             fs::current_path(config.project_path) ;
@@ -42,8 +42,8 @@ inline namespace v1 {
 
         switch (config.build) {
             case cman::BuildType::SHELL_SCRIPT:
-                if (!fs::exists("build.sh")) generate_build_sh();
-                compile_bash();
+                if (!fs::exists("build.sh")) generate_build_sh(config);
+                compile_bash(config.project_name);
                 break;
 
             case cman::BuildType::BUILD_FILE:
@@ -53,8 +53,8 @@ inline namespace v1 {
             case cman::BuildType::CMAKE:
                 try {
                     //TODO: try to create the build folder.
-                    fs::current_path(config.project_name + "build");
-                    std::system("cmake"); 
+                    fs::current_path(config.project_name + "/build/");
+                    std::system("cmake"); //TODO: add sane cmake defaults.
                 } catch (const fs::filesystem_error& e) {
                     cman::print_message(e.what(), ERROR);
                 }
@@ -63,7 +63,7 @@ inline namespace v1 {
             case cman::BuildType::MAKE:
                 compile_make();
                 break;
-                
+
             default:
                 //NOTE: possible dead path below
                 print_message("Unknown build type", ERROR);
@@ -71,13 +71,20 @@ inline namespace v1 {
 
     }
 
-    void generate_build_sh(std::string_view project_name) {
+    void generate_build_sh(const BuildConfig& config) {
         //TODO: add options for standards, release builds, language selection.
-        if (!fs::exists("./build.sh")) return;
-        if (fs::exists("./src/") || (fs::current_path().filename() == project_name)) {
+        if (fs::exists("./build.sh")) return;
+        if (fs::exists("./src/") || (fs::current_path().filename() == config.project_name)) {
             std::ofstream shell_script("build.sh");
             //TODO: have boiler plates sit in utils.
-            shell_script << "g++ ./src/*.cpp -o ./bin/" <<  project_name << " -Wall -Wextra\n";
+
+            if (config.language == Lang::CPP) {
+                shell_script << "g++";
+            } else {
+                shell_script << "gcc";
+            }
+
+            shell_script << " ./src/*.cpp -o ./bin/" <<  config.project_name << " -Wall -Wextra\n";
             std::system("chmod +x build.sh");
             shell_script.close();
 
@@ -108,6 +115,8 @@ inline namespace v1 {
 
     //NOTE: function below a possible chokepointn, watch out when profiling.
     //TODO: try to avoid the expensive string copies.
+    //TODO: implement file state tracking.
+    //FIX: std::unexpected might be unnecessary here.
     std::expected<bool, cman::FsError> FileStates::was_modified(std::string filename) {
 
         if(fs::exists(filename)) {
@@ -137,7 +146,7 @@ inline namespace v1 {
 
     void FileStates::dump_state_to_json() {
         nlohmann::json json_obj;
-        
+
         //TODO: eliminate loop below.
         for (const auto& pair : this->access_times) {
             json_obj[pair.first] = pair.second.time_since_epoch().count();

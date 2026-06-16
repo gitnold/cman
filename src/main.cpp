@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <print>
 #include <string_view>
+#include "semantic_analysis.h"
 
 
 //HACK: use a macro to define a debug control mode - use g++ -DEBUG to toggle debug mode.
@@ -46,20 +47,24 @@ void cman::print_message(const char *message, cman::MessageType type) {
 //TODO: how cargo detects file changes.
 
 int main(int argc, char** argv) {
-    //NOTE: consinder adding a cman::init() pattern.
-    //launch the cli argument parser.
-    auto cli = cman::Config(argv, argc);
+    // TODO: make the lex mode dynamic.
+    auto lex_mode = cman::LexMode::CLI;
+    auto cli = cman::Config(argv, argc, lex_mode);
     cli.parse();
 
     //launch the evaluator.
-    auto parser = cman::Parser(cli.options);
-   
+    auto parser = cman::Parser(cli.options, lex_mode);
+
     //if parser returns a non-okay status, return failure, leave details to the semantic analysis.
     // NOTE: pissible logic bug below.
     if (parser.parse() != cman::ResultType::OK) {
         return EXIT_FAILURE;
     }
 
+    cman::SemanticAnalyzer semantic_analyzer = cman::SemanticAnalyzer(parser.parse_result);
+    if (semantic_analyzer.analyze() == cman::ResultType::OK) {
+        semantic_analyzer.execute();
+    }
     return EXIT_SUCCESS;
 }
 

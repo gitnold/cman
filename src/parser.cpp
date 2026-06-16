@@ -2,7 +2,7 @@
 #include "parser.h"
 #include "build.h"
 #include "cli.h"
-#include "filesystem.h"
+// #include "filesystem.h"
 #include "style.h"
 // #include <print>
 #include <string>
@@ -16,16 +16,15 @@
 
 namespace cman {
 inline namespace v1 {
-    Parser::Parser(std::vector<cman::Option> options) {
+    Parser::Parser(std::vector<cman::Option> options, LexMode mode) {
         //TODO: save the project name somewhere.
         this->options = options;  // avoid taking a copy of options
         ResultType status = get_optiontypes();
-        if (status == ResultType::OK) {
-            construct_hash();
-            evaluate();
+
+        if (mode == LexMode::CLI) {
+            this->parse_result.cli_args = true;
         }
-        //TODO: show that an illegal token was found and posssibly what it was.
-        //TODO: find a way to use the returned error values.
+
     }
 
 
@@ -33,15 +32,15 @@ inline namespace v1 {
     Parser::~Parser() {
         //do nothing.
     }
-    
+
     // TODO: check code correctness.
     ResultType Parser::parse() {
-        
+
         // build context.
         BuildCtx build_context;
         ProjectCtx project_context;
 
-        
+
         for (Option option : this->options) {
             switch (option.type) {
                 case OptionType::HELP:
@@ -52,13 +51,13 @@ inline namespace v1 {
 
                 case OptionType::NEW:
                     // project context set.
-                    if (option.value.empty() == 0) {
+                    if (option.value.empty()) {
                         cman::print_message("--new cannot have an empty project name", ERROR);
                         return ResultType::ILLEGAL_FORMAT;
                     }
                     this->parse_result.project_name = option.value;
                     this->parse_result.init_project = true;
-                    
+
                     project_context.projectname_set = true;
                     build_context.bin_path_set = true; // add support for overriding this later.
                     break;
@@ -86,42 +85,61 @@ inline namespace v1 {
                     if (option.value.empty()) {
                         cman::print_message("--lang <language e.g  c/cpp> cannot have an empty value", ERROR);
                         return ResultType::EMPTY_TOKEN;
-                    } 
+                    }
 
                     build_context.lang_set = true;
 
                     this->parse_result.language = option.value;
                     break;
-                
+
                 case OptionType::INIT:
                     // project context set.
-                    this->parse_result.init_dir = true; 
+                    this->parse_result.init_dir = true;
                     break;
 
                 case OptionType::MODE:
                     if (option.value.empty()) {
-                        // use the default mode.
+                        // use the default mode - default, no optimizations etc..
+                        this->parse_result.mode = BuildMode::DEFAULT;
+                    } else {
+                        // TODO: consinder adding shorthands like r or d for ergonomics.
+                        if (option.value == "release") {
+                            this->parse_result.mode = BuildMode::RELEASE;
+                        } else if (option.value == "debug") {
+                            this->parse_result.mode = BuildMode::DEBUG;
+                        } else {
+                            this->parse_result.mode = BuildMode::DEFAULT;
+                            print_message("Unknown build mode was passed, using the default mode", INFO);
+                        }
+                    }
+                    break;
+
+                case cman::OptionType::BUILD_TYPE:
+                    if (option.value.empty()) {
+                        // use the default mode - shell script.
+                        this->parse_result.build_type = BuildType::SHELL_SCRIPT;
                     } else {
 
                     }
+                    break;
 
                 // print version information and exit.
-                case cman::OptionType::VERSION:
+                case OptionType::VERSION:
                     cman::help_menu::print_version_info();
                     return ResultType::OK;
                     break;
-                
+
                 // the update option should short circuit(no need for further computution), no other feasible combination.
-                case cman::OptionType::UPDATE:
+                case OptionType::UPDATE:
                     cman::utils::self_update(utils::UpdateMode::SRC);
                     return ResultType::OK;
-                
-                case cman::OptionType::CLI_ARGS:
+
+                case OptionType::CLI_ARGS:
                     if (!parse_result.run_bin) {
                         cman::print_message("commands line arguments for the built binary should be put after the --run option", ERROR);
-                        return ResultType::ILLEGAL_FORMAT; 
+                        return ResultType::ILLEGAL_FORMAT;
                     }
-                    
+
                     if (!option.value.empty()) {
                         // process provided arguments.
                         // NOTE: only trigger this if the --run is used.
@@ -142,7 +160,6 @@ inline namespace v1 {
     //FIX: abort when an illegal option is encountered.
     ResultType Parser::get_optiontypes() {
         for (Option option: this->options) {
-            //HACK: design a custom viewer fucntion to visualize the pipeline.
             //debug line below
             // std::println("Option type->{} : option value->{}",static_cast<int>(option.type), option.value);
 
@@ -155,72 +172,6 @@ inline namespace v1 {
                 return ResultType::ILLEGAL;
             }
         }
-        return ResultType::OK;
-    }
-
-    //TODO: do sth like a result type for this function for error handling.
-    [[deprecated("function no longer used")]]
-    ResultType Parser::construct_hash() {
-        std::string hash_str;
-
-        if (this->tokens.empty()) {
-            return ResultType::EMPTY_TOKEN;
-
-        }
-        //HACK: try byte arrays for speed up.
-        for (OptionType token: this->tokens) {
-            hash_str.append(std::to_string(static_cast<int>(token)));
-            // hash += static_cast<int>(token);
-        }
-        this->hash = {.value = hash_str};
-        return ResultType::OK;
-    }
-
-    //NOTE: find a better altenative to branching, like a hashmap.
-    ResultType Parser::evaluate() {
-
-        // std::println("Hash value {}", this->hash.value);
-        // FIX: for `--init` options set project_name to current directory.
-
-        if (this->hash.value.compare("03") == 0) {
-            cman::initialize_newbin_project(this->project_name);
-            cman::initialize_git();
-
-        } else if (this->hash.value.compare("04") == 0) {
-            return ResultType::UNIMPLEMENTED;
-
-        } else if (this->hash.value.compare("034") == 0) {
-            return ResultType::UNIMPLEMENTED;
-
-        } else if (this->hash.value.compare("23") == 0) {
-            cman::initialize_current_dir();
-            //FIX: overload or fix git + init variants where project is current directory.
-            cman::initialize_git();
-
-        } else if (this->hash.value.compare("1") == 0 || this->hash.value.empty()) {
-            //print help.
-            cman::print_message("Printing help", INFO);
-            cman::print_help();
-
-        } else if (this->hash.value.compare("2") == 0) {
-            cman::initialize_current_dir();
-
-        } else if (this->hash.value.compare("0") == 0) {
-            cman::initialize_newbin_project(this->project_name);
-
-        // --run option.
-        } else if (this->hash.value.compare("5") == 0) {
-            //cman::run(this->project_name);
-
-        //--build option
-        } else if (this->hash.value.compare("6") == 0) {
-            //cman::build();
-        } else if (this->hash.value.compare("7") == 0) {
-        
-        } else {
-            return ResultType::ILLEGAL_FORMAT;
-        }
-
         return ResultType::OK;
     }
 

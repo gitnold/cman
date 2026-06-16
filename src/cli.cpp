@@ -1,32 +1,43 @@
 #include "cli.h"
+#include "json.hpp"
+#include "style.h"
+#include "utils/self_update.h"
+#include <filesystem>
+#include <fstream>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
+namespace fs = std::filesystem;
+
 namespace cman {
 inline namespace v1 {
-    Config::Config(char** args,int number){
+    Config::Config(char** args,int number, LexMode mode){
         this->args = args;
         this->num_of_args = number;
         this->package_name = "Cman";
 
+        //TODO:  if theres no cli args use the json configs.
+        //TODO:  cli args might be provided but insufficient, requiring config consolidation. have the user explicity  enable config parsing.
+        if (number > 1) {
+            this->parse();
+        } 
+        this->parse_config();
+
         //this->options {}; //TODO: how to declare an empty vector without initializing
 
     }
-    
+
     Config::~Config() {
-        
+
     }
 
     void Config::parse() {
-        // std::vector<char*> args {this->args};
+        // TODO: check whether the args array is 1 indicating its empty and print the help menu.
+        
         for (int i = 1; i < this->num_of_args; i++) {
-            //TODO: rectify the null read on the last iteration for the second parameter to check_arg()
-            //FIX: skip first arg as its the program itself.
-            //TODO: return the options to the user on instantiating the cli parser.
-            //FIX: logic below causes segfaults why??
-            
-            this->options.push_back(check_arg(this->args[i], this->args[i+1]));
+
             const char* current = this->args[i];
             char* next = (i + 1 < this->num_of_args) ? this->args[i + 1] : nullptr;
 
@@ -46,9 +57,7 @@ inline namespace v1 {
     }
 
     Option Config::check_arg(const char* arg,  char* value) {
-        //TODO: add support for -v or --version
-        //TODO: add support for -- for passing cli options to the resulting binary.
-        //Find whether a trie is more efficient for the giant if else toggle below.
+        //Find whether a trie is more efficient for the giant if else toggle below or a hashset instead O(1) lookups.
         std::string value_new;
         if (value == nullptr) {
             value_new = "";
@@ -58,10 +67,13 @@ inline namespace v1 {
 
         std::string_view option {arg};
 
-        if (option.compare("-h") || option.compare("--help")) {
+        // NOTE: compare() returns zero on match, non-zero on mismatch, values must be checked against zero
+        //      - to avoid truthy values trap.
+
+        if (option.compare("-h") == 0 || option.compare("--help") == 0) {
             return make_option(OptionType::HELP, value_new);
 
-        } else if (option.compare("-v") || option.compare("--version")) {
+        } else if (option.compare("-v") == 0 || option.compare("--version") == 0) {
             return make_option(OptionType::HELP, value_new);
 
         } else if (option.compare("--git") == 0) {
@@ -72,7 +84,7 @@ inline namespace v1 {
             return make_option(OptionType::INIT, value_new);
         } else if (option.compare("--run") == 0) {
             return make_option(OptionType::RUN, value_new);
-            
+
         } else if (option.compare("--build") == 0) {
             return make_option(OptionType::BUILD, value_new);
 
@@ -82,12 +94,17 @@ inline namespace v1 {
         } else if (option.compare("--lang") == 0) {
             return make_option(OptionType::LANGUAGE, value_new);
 
-        } else if (option.compare("--update")) {
+        } else if (option.compare("--update") == 0) {
             return make_option(OptionType::UPDATE, value_new);
-        
-        } else if (option.compare("--mode")){
+
+        } else if (option.compare("--mode") == 0){
             return make_option(OptionType::MODE, value_new);
-        } else if (option.compare("--")) {
+
+        }else if (option.compare("--type") == 0){
+            return make_option(OptionType::BUILD_TYPE, value_new);
+
+        // arguments after -- are passed to the resulting binary/build
+        } else if (option.compare("--") == 0) {
             return make_option(OptionType::CLI_ARGS, value_new);
 
         } else if (option.empty() == true) {
@@ -95,9 +112,67 @@ inline namespace v1 {
 
         } else {
             return make_option(OptionType::ILLEGAL, "Unknown option passed!!");
-        
+
         }
     }
+
+
+    Option Config::check_arg_map(const char* arg, char* value) {
+        auto option = known_options.find(arg);
+
+        // if the option is not found check whether the user passed a short form of the option.
+        // if not a shorthand then it is an illegal token. 
+        if (option == known_options.end()) {
+            std::string short_arg {arg};
+
+            if (short_arg.compare("-h") == 0) {
+                option = known_options.find("--help");
+        
+            } else if (short_arg.compare("-v") == 0) {
+                option = known_options.find("--version");
+            
+            } else {
+                return Option(OptionType::ILLEGAL, "Unknown option encountered");
+            }
+    
+        }
+
+        option->second.value = value;
+        return option->second;
+    
+    }
+    
+    bool Config::parse_config() {
+        using json = nlohmann::json;
+
+        //FIX: boolean returns insufficient, find a more informative type. Need to know what exactly failed.   
+
+        // check if the global config file exists. if not try to create it.
+        if (fs::exists(cman::utils::GLOBAL_CONFIG_FILE)) {
+            std::ifstream f (cman::utils::GLOBAL_CONFIG_FILE);
+            this->global_config = json::parse(f);
+
+        } else {
+            cman::print_message("Failed to open global config file!! Skipping.....", ERROR);
+        }
+        
+        // check for a local config. might need project context and project traversal.. 
+        fs::path local_config; 
+        auto result = find_local_config(fs::current_path());
+        
+        if (!result.has_value()) {
+            cman::print_message("Local config file not found!! Skipping.....", WARNING);
+            return false;
+        
+        } else {
+            local_config = result.value();
+            std::ifstream f ("local_config");
+            this->local_config = json::parse(f);
+        }
+
+        return true;
+    }
+
 
     Option Config::make_option(OptionType type, std::string value) {
         switch (type) {
@@ -164,14 +239,14 @@ inline namespace v1 {
                     .value = value
                 };
                 break;
-            
+
             case cman::OptionType::UPDATE:
                 return (Option) {
                     .type = OptionType::UPDATE,
                     .value = value
                 };
                 break;
-            
+
 
             case cman::OptionType::MODE:
                 return (Option) {
@@ -179,7 +254,7 @@ inline namespace v1 {
                     .value = value
                 };
                 break;
-            
+
             case cman::OptionType::VERSION:
                 return (Option) {
                     .type = OptionType::VERSION,
@@ -194,6 +269,13 @@ inline namespace v1 {
                 };
                 break;
 
+            case cman::OptionType::BUILD_TYPE:
+                return (Option) {
+                    .type = OptionType::BUILD_TYPE,
+                    .value = value
+                };
+                break;
+
             default:
                 //TODO: find a way to propagate errors.
                 return (Option) {
@@ -201,5 +283,25 @@ inline namespace v1 {
                     .value = "Unrecognized option encountered!!"
                 };
         }
+    }
+
+    // iterate over the parent folders looking for the target files.
+    std::optional<fs::path> find_local_config(fs::path start) {
+        start = fs::absolute(start);
+
+        while (!start.empty()) {
+            fs::path target = start / "cman.json";
+            
+            if (fs::exists(target)) return target;
+
+            fs::path parent = start.parent_path();
+
+            // add a check to ensure if we,re at the root we stop moving up.
+            if (parent == start) break;
+
+            start = parent;
+        }
+
+        return std::nullopt;
     }
 }}

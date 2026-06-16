@@ -2,10 +2,12 @@
 #define CMAN_SEMANTIC_ANALYSIS_H
 
 #include "build.h"
+#include "json.hpp"
 #include "parser.h"
-// #include <optional>
+#include <optional>
 #include <vector>
- 
+
+
 // semantic context.
 // before triggering a build : lang must be set, paths must be defined, BuildType must be set.
 // before initialization: project name must be set.
@@ -21,15 +23,8 @@ inline namespace v1 {
         UPDATE_CMAN
     };
     
-    // useful when an executor is added later.
-    // struct Action {
-    //     ActionType action;
-    //     std::optional<BuildConfig> build_config;
-    //     static Action build(BuildConfig& config);
-    //     static Action new_project();
-    //     static Action init();
-    // };
-
+    
+    
     struct BuildCtx {
         bool lang_set = false;
         bool bin_path_set = false;
@@ -48,14 +43,20 @@ inline namespace v1 {
     };
 
     class SemanticAnalyzer {
+        using json = nlohmann::json; 
+
         BuildConfig build_config;
         BuildCtx build_ctx;
         ProjectCtx project_ctx;
+        std::optional<json> g_config;
+        std::optional<json> l_config;
         std::vector<ActionType> action_list;
+
         public:
             const ParsedInput& parsed;
-            SemanticAnalyzer(const ParsedInput& parser_output);
+            SemanticAnalyzer(const ParsedInput& parser_output, std::optional<json> g_config, std::optional<json> l_config);
             ResultType analyze();
+            ResultType analyze_configs();
             void execute();
     };
     

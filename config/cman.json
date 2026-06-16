@@ -1,8 +1,22 @@
 // cman config file.
 // holds the global attributes and settings necessary for cman to work correctly.
 {
-    "name" : "cman",
+    "project name" : "cman"
     "version" : 0.1,
     "bin path" : "~/Applications/",
-    "config-path" : "~/.config/cman/cman.json",
+    "config-path" : "~/.config/cman/cman.json",,
+    "project path" : "~/coding/dev/cman/",
+    "language" : "cpp",
+    "build mode" : "release",
+    "build type" : "shell script",
+
+    // conssinder later.
+    "build command" : "g++ main.c -o main", // the generated command that is ran to avoid repeating the same cli args esp for frequent builds.
+    "tasks" : ["gtest blahblahblah", "valgrind etcetc"]
+
+    // have file states as a separate file under bin.
+    // NOTE: json files are useful when using shell scripts or dry run commands
+    //NOTE: this allows persitence across runs. cmake, make and the build.cpp do this already.
+
+
 }

@@ -34,6 +34,7 @@ inline namespace v1 {
         }
 
         std::vector<std::string> split_string(std::string);
+        void generate_cman_json(BuildConfig& buildconfig);
         
     } // namespace utils
 } // inline namespace v1

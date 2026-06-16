@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="CMakeProjectFlavorService">
+    <option name="flavorId" value="CMakePlainProjectFlavor" />
+  </component>
+  <component name="CMakeRunConfigurationManager">
+    <generated />
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="9d35245b-45d7-4ffa-b929-13db0722dfa5" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/CHECKLIST.md" beforeDir="false" afterPath="$PROJECT_DIR$/CHECKLIST.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/cman.json" beforeDir="false" afterPath="$PROJECT_DIR$/config/cman.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/ast.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/ast_better.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/build.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/build.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/cli.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/cli.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/filesystem.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/filesystem.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/parser.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/parser.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/semantic_analysis.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/semantic_analysis.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/utils/config_templates.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/utils/config_templates.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/utils/help_menu.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/utils/help_menu.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/utils/linkedlist.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/utils/self_update.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/utils/self_update.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/build.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/build.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cli.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/cli.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/filesystem.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/filesystem.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/parser.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/parser.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/semantic_analysis.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/semantic_analysis.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/help_menu.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/help_menu.cpp" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="CompDBLocalSettings">
+    <option name="availableProjects">
+      <map>
+        <entry>
+          <key>
+            <ExternalProjectPojo>
+              <option name="name" value="cman" />
+              <option name="path" value="$PROJECT_DIR$" />
+            </ExternalProjectPojo>
+          </key>
+          <value>
+            <list>
+              <ExternalProjectPojo>
+                <option name="name" value="cman" />
+                <option name="path" value="$PROJECT_DIR$" />
+              </ExternalProjectPojo>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="projectSyncType">
+      <map>
+        <entry key="$PROJECT_DIR$" value="RE_IMPORT" />
+      </map>
+    </option>
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="54" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="antyN7jD" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectApplicationVersion">
+    <option name="ide" value="CLion" />
+    <option name="majorVersion" value="2026" />
+    <option name="minorVersion" value="1.3" />
+    <option name="productBranch" value="Classic" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 2,
+  "fromUser": false
+}]]></component>
+  <component name="ProjectId" id="3EtRdHVfMPOQwts8F6MohNEG3LD" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.RadMigrateCodeStyle": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "dev",
+    "last_opened_file_path": "/home/fednold/coding/dev/cman/compile_commands.json",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "org.rust.first.attach.projects": "true",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="RustProjectSettings">
+    <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9d35245b-45d7-4ffa-b929-13db0722dfa5" name="Changes" comment="" />
+      <created>1780995968970</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1780995968970</updated>
+      <workItem from="1780995976382" duration="526000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

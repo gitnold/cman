@@ -7,7 +7,7 @@
 #include <string>
 #include <system_error>
 #include <unistd.h>
-#include "cli.h"
+// #include "cli.h"
 #include "style.h"
 #include "build.h"
 #include "utils/config_templates.h"
@@ -31,35 +31,35 @@ inline namespace v1 {
             //FIX: initialize_git in the bin project folder for --new option.
             [[maybe_unused]]int git_repo = system("git init > /dev/null");
             std::string git_ignore {"bin\ndebug\nassets\n"};
-            
+
             //TODO: wrap logic below in a try block.
             std::ofstream gitfile (".gitignore");
-    
+
             if (!gitfile) {
                 print_message("Error opening file", ERROR);
                 return;
             }
 
             //writing to file.
-            gitfile << git_ignore << std::endl; 
+            gitfile << git_ignore << std::endl;
             gitfile.close();
 
             print_message("Successfully written to .gitignore", DEBUG);
         }
-        
+
     }
-    
+
     //TODO: overload function below or add a switch case to avoid code repetition.
     //TODO: generate a main.cpp with hello from <project name>, and a build.sh
-    int initialize_newbin_project(std::string project_name) {
+    int initialize_newbin_project(std::string project_name, const BuildConfig& config) {
         std::array<std::string, 4> dirs { "bin", "include", "src", "debug"};
         std::error_code err;
-        
+
         //FIX: check if the directories exist.
         print_message("Creating a new binary project", DEBUG);
         for (std::string dir : dirs) {
             fs::create_directories("./" + project_name + "/" + dir, err);
-            
+
             if (err.value() != 0) {
                 print_message(err.message().c_str(), ERROR);
                 return EXIT_FAILURE;
@@ -67,33 +67,34 @@ inline namespace v1 {
             } else {
                 std::string message {"Creating " + dir + " directory..."};
                 print_message(message.c_str(), INFO);
-            
+
             }
         }
         //generate a main.cpp/main.c file and put some boilerplate code.
         std::string mainfile {""};
         // FIX: move to a reference, avoid the global config struct.
-        switch (Config.language) {
+        switch (config.language) {
             case cman::Lang::CPP:
-                mainfile = ("./" + project_name + "/src/main.c");
+                mainfile = ("./" + project_name + "/src/main.cpp");
                 break;
             case cman::Lang::C:
-                mainfile = ("./" + project_name + "/src/main.cpp");
+                mainfile = ("./" + project_name + "/src/main.c");
                 break;
             default:
                 print_message("Unsuppported Language specified", ERROR);
         }
         std::ofstream main_file(mainfile);
-        main_file << utils::hello_world(project_name, Config.language);
+        main_file << utils::hello_world(project_name, config.language);
         main_file.close();
         return EXIT_SUCCESS;
     }
 
-    //overloaded nebin function.
+    //overloaded newbin function.
+    // FIX: overloading might be unnecessary!!
     int initialize_newbin_project() {
         std::array<std::string, 4> dirs { "bin", "include", "src", "debug"};
         std::error_code err;
-        
+
         //FIX: check if the directories exist.
         print_message("Creating a new binary project", DEBUG);
         for (std::string dir : dirs) {
@@ -126,7 +127,7 @@ inline namespace v1 {
             print_message("Current directory does not exist!",  ERROR);
             return;
         }
-        
+
         //TODO: try to detect bash build scripts, makefiles and cmake files.
         //TODO: create a hashmap of trackable files. WTH??
         try {
@@ -143,8 +144,8 @@ inline namespace v1 {
                     //TODO: check for case edge cases.
                     } else if (extension == ".cpp" || extension == ".c" || extension == ".cxx" || extension == ".cc") {
                         //copy files to src directory..
-                        fs::copy(entry.path(), "./src/"); 
-                    
+                        fs::copy(entry.path(), "./src/");
+
                     } else if ((perms & fs::perms::others_exec) != fs::perms::none ||
                             (perms & fs::perms::group_exec) != fs::perms::none ||
                             (perms & fs::perms::owner_exec) != fs::perms::none){
@@ -156,9 +157,8 @@ inline namespace v1 {
                 }
             }
         } catch (const fs::filesystem_error& e) {
-            print_message(e.what(), ERROR); 
+            print_message(e.what(), ERROR);
         }
     }
-
 
 }}
