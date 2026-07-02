@@ -20,25 +20,42 @@ config = {
 }
 
 def parse_cli_args():
+    help_menu = """A python script for building cman.\nUsage:
+        help            :: print this help menu and quit.
+        build           :: build the project using default settings.
+        run             :: build and run the resulting binary.
+        build-release   :: build an optimized version of cman.
+        test            :: build cman in test mode and run integration tests.
+        debug           :: build a debug build of cman.
+    """
     args = sys.argv
     
     if len(args) < 2:
-        print("Usage: python build.py [build|run|build-release|test|debug]")
+        print(help_menu)
         sys.exit(1)
-    
-    if args[1] == "build":
+
+    if args[1] == "help":
+        print(help_menu)
+        sys.exit(0)
+
+    elif args[1] == "build":
         config['mode'] = BuildMode.BUILD
+    
     elif args[1] == "run":
         config['mode'] = BuildMode.BUILD
         config['run'] = True
+    
     elif args[1] == "build-release":
         config['mode'] = BuildMode.RELEASE
+    
     elif args[1] == "test":
         config['mode'] = BuildMode.TEST
+    
     elif args[1] == "debug":
         config['mode'] = BuildMode.DEBUG
+    
     else:
-        print("Unknown argument passed! Usage: python build.py [build|run|build-release|test|debug]")
+        print(help_menu)
         sys.exit(1)
 
 
