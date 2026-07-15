@@ -5,6 +5,7 @@
 // #include "filesystem.h"
 #include "style.h"
 // #include <print>
+#include <array>
 #include <string>
 #include <vector>
 #include "semantic_analysis.h"
@@ -12,14 +13,12 @@
 #include "utils/help_menu.h"
 // #include "build.h"
 
-//FIX: fis the hashing its non-deterministic.
 
 namespace cman {
 inline namespace v1 {
     Parser::Parser(std::vector<cman::Option> options, LexMode mode) {
-        //TODO: save the project name somewhere.
         this->options = options;  // avoid taking a copy of options
-        ResultType status = get_optiontypes();
+        [[maybe_unused]] ResultType status = get_optiontypes();
 
         if (mode == LexMode::CLI) {
             this->parse_result.cli_args = true;
@@ -27,13 +26,10 @@ inline namespace v1 {
 
     }
 
-
-
     Parser::~Parser() {
         //do nothing.
     }
 
-    // TODO: check code correctness.
     ResultType Parser::parse() {
 
         // build context.
@@ -98,11 +94,10 @@ inline namespace v1 {
                     break;
 
                 case OptionType::MODE:
+                    this->parse_result.mode_explicit = true;
                     if (option.value.empty()) {
-                        // use the default mode - default, no optimizations etc..
                         this->parse_result.mode = BuildMode::DEFAULT;
                     } else {
-                        // TODO: consinder adding shorthands like r or d for ergonomics.
                         if (option.value == "release") {
                             this->parse_result.mode = BuildMode::RELEASE;
                         } else if (option.value == "debug") {
@@ -115,11 +110,20 @@ inline namespace v1 {
                     break;
 
                 case cman::OptionType::BUILD_TYPE:
+                    this->parse_result.build_type_explicit = true;
                     if (option.value.empty()) {
-                        // use the default mode - shell script.
                         this->parse_result.build_type = BuildType::SHELL_SCRIPT;
                     } else {
-
+                        if (option.value == "script") {
+                            this->parse_result.build_type = BuildType::SHELL_SCRIPT;
+                        } else if (option.value == "make") {
+                            this->parse_result.build_type = BuildType::MAKE;
+                        } else if (option.value == "cmake") {
+                            this->parse_result.build_type = BuildType::CMAKE;
+                        } else {
+                            print_message("Unknown build type, using shell script", WARNING);
+                            this->parse_result.build_type = BuildType::SHELL_SCRIPT;
+                        }
                     }
                     break;
 
@@ -155,6 +159,7 @@ inline namespace v1 {
                     return ResultType::ILLEGAL;
             }
         }
+        return ResultType::OK;
     }
 
     //FIX: abort when an illegal option is encountered.
@@ -176,3 +181,5 @@ inline namespace v1 {
     }
 
 }}
+
+

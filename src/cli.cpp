@@ -1,4 +1,5 @@
 #include "cli.h"
+#include "build.h"
 #include "json.hpp"
 #include "style.h"
 #include "utils/self_update.h"
@@ -13,16 +14,14 @@ namespace fs = std::filesystem;
 
 namespace cman {
 inline namespace v1 {
-    Config::Config(char** args,int number, LexMode mode){
+    Config::Config(std::vector<std::string> args, [[maybe_unused]] LexMode mode){
         this->args = args;
-        this->num_of_args = number;
+        this->num_of_args = args.size();
         this->package_name = "Cman";
 
         //TODO:  if theres no cli args use the json configs.
         //TODO:  cli args might be provided but insufficient, requiring config consolidation. have the user explicity  enable config parsing.
-        if (number > 1) {
-            this->parse();
-        } 
+        // parse() is called from main.cpp — avoid double-parsing.
         this->parse_config();
 
         //this->options {}; //TODO: how to declare an empty vector without initializing
@@ -38,8 +37,8 @@ inline namespace v1 {
         
         for (int i = 1; i < this->num_of_args; i++) {
 
-            const char* current = this->args[i];
-            char* next = (i + 1 < this->num_of_args) ? this->args[i + 1] : nullptr;
+            const char* current = this->args[i].c_str();
+            const char* next = (i + 1 < this->num_of_args) ? this->args[i + 1].c_str() : nullptr;
 
             // Must be an option (starts with '-')
             if (current[0] == '-') {
@@ -56,7 +55,7 @@ inline namespace v1 {
         }
     }
 
-    Option Config::check_arg(const char* arg,  char* value) {
+    Option Config::check_arg(const char* arg,  const char* value) {
         //Find whether a trie is more efficient for the giant if else toggle below or a hashset instead O(1) lookups.
         std::string value_new;
         if (value == nullptr) {
@@ -74,7 +73,7 @@ inline namespace v1 {
             return make_option(OptionType::HELP, value_new);
 
         } else if (option.compare("-v") == 0 || option.compare("--version") == 0) {
-            return make_option(OptionType::HELP, value_new);
+            return make_option(OptionType::VERSION, value_new);
 
         } else if (option.compare("--git") == 0) {
             return make_option(OptionType::GIT, value_new);
@@ -117,7 +116,7 @@ inline namespace v1 {
     }
 
 
-    Option Config::check_arg_map(const char* arg, char* value) {
+    Option Config::check_arg_map(const char* arg, const char* value) {
         auto option = known_options.find(arg);
 
         // if the option is not found check whether the user passed a short form of the option.
@@ -148,8 +147,9 @@ inline namespace v1 {
         //FIX: boolean returns insufficient, find a more informative type. Need to know what exactly failed.   
 
         // check if the global config file exists. if not try to create it.
-        if (fs::exists(cman::utils::GLOBAL_CONFIG_FILE)) {
-            std::ifstream f (cman::utils::GLOBAL_CONFIG_FILE);
+        if (fs::exists(expand_path(cman::utils::GLOBAL_CONFIG_FILE))) {
+            // expand the tilde path correctly.
+            std::ifstream f (expand_path(cman::utils::GLOBAL_CONFIG_FILE));
             this->global_config = json::parse(f);
 
         } else {
@@ -166,7 +166,7 @@ inline namespace v1 {
         
         } else {
             local_config = result.value();
-            std::ifstream f ("local_config");
+            std::ifstream f (local_config.string());
             this->local_config = json::parse(f);
         }
 
@@ -305,3 +305,15 @@ inline namespace v1 {
         return std::nullopt;
     }
 }}
+
+#ifdef CMAN_TESTS
+
+namespace tests {
+    bool test_lexer() {
+        // test the lexers parsing logic.
+        return true;
+    }
+
+}
+
+#endif // CMAN_TESTS

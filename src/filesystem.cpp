@@ -29,7 +29,7 @@ inline namespace v1 {
 
         if (WEXITSTATUS(check_git) == 0) {
             //FIX: initialize_git in the bin project folder for --new option.
-            [[maybe_unused]]int git_repo = system("git init > /dev/null");
+            system("git init > /dev/null");
             std::string git_ignore {"bin\ndebug\nassets\n"};
 
             //TODO: wrap logic below in a try block.
@@ -114,7 +114,7 @@ inline namespace v1 {
         return EXIT_SUCCESS;
     }
 
-    void initialize_current_dir() {
+    void initialize_current_dir(const BuildConfig& config) {
         //get the current working directory.
         std::string current_dir = fs::current_path();
         int status = initialize_newbin_project();
@@ -159,6 +159,21 @@ inline namespace v1 {
         } catch (const fs::filesystem_error& e) {
             print_message(e.what(), ERROR);
         }
+
+        std::string dir_name = fs::current_path().filename().string();
+        std::string mainfile;
+        switch (config.language) {
+            case cman::Lang::CPP:
+                mainfile = "./src/main.cpp";
+                break;
+            case cman::Lang::C:
+            default:
+                mainfile = "./src/main.c";
+                break;
+        }
+        std::ofstream main_file(mainfile);
+        main_file << utils::hello_world(dir_name, config.language);
+        main_file.close();
     }
 
 }}

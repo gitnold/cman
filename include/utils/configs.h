@@ -6,7 +6,7 @@ namespace cman {
 inline namespace v1 {
 
     namespace utils {
-        bool dump_state_json(const BuildConfig& build_config);
+        bool dump_state_to_json(const BuildConfig& build_config);
     }
 
 }

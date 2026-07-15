@@ -54,7 +54,7 @@ inline namespace v1 {
 
         public:
             const ParsedInput& parsed;
-            SemanticAnalyzer(const ParsedInput& parser_output, std::optional<json> g_config, std::optional<json> l_config);
+            SemanticAnalyzer(const ParsedInput& parser_output, std::optional<json> g_config = std::nullopt, std::optional<json> l_config = std::nullopt);
             ResultType analyze();
             ResultType analyze_configs();
             void execute();

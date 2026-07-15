@@ -29,7 +29,7 @@ def parse_cli_args():
         debug           :: build a debug build of cman.
     """
     args = sys.argv
-    
+
     if len(args) < 2:
         print(help_menu)
         sys.exit(1)
@@ -40,20 +40,20 @@ def parse_cli_args():
 
     elif args[1] == "build":
         config['mode'] = BuildMode.BUILD
-    
+
     elif args[1] == "run":
         config['mode'] = BuildMode.BUILD
         config['run'] = True
-    
+
     elif args[1] == "build-release":
         config['mode'] = BuildMode.RELEASE
-    
+
     elif args[1] == "test":
         config['mode'] = BuildMode.TEST
-    
+
     elif args[1] == "debug":
         config['mode'] = BuildMode.DEBUG
-    
+
     else:
         print(help_menu)
         sys.exit(1)
@@ -81,7 +81,7 @@ def cman_build():
     if config['mode'] == BuildMode.TEST:
         # First build cman-test (embedded tests)
         compileCman(BuildMode.TEST)
-        
+
         # Run the compiled cman-test
         cman_test_path = build_dir_path / "cman-test"
         print(f"Running embedded tests ({cman_test_path})...")
@@ -89,7 +89,7 @@ def cman_build():
         if test_result.returncode != 0:
             print("Embedded tests failed!")
             sys.exit(1)
-            
+
         # Run integration tests
         runIntegrationTests()
     else:
@@ -106,7 +106,7 @@ def runIntegrationTests():
         for entry in tests_folder.glob("*.cpp"):
             if entry.is_file() and entry.stat().st_size > 0:
                 test_files.append(entry)
-        
+
         #create a test bin folder for separation.
         tests_bin = tests_folder / "bin"
         tests_bin.mkdir(parents=True, exist_ok=True)
@@ -136,7 +136,7 @@ def runIntegrationTests():
                 any_failed = True
             else:
                 print(f"Test {test_bin} passed!!\n")
-        
+
         if any_failed:
             sys.exit(1)
     else:
@@ -145,12 +145,12 @@ def runIntegrationTests():
 
 def compileCman(mode: BuildMode):
     command = []
-    
+
     # Expand wildcard and split flags
     cxx_flags = config['cxx_flags'].split()
     includes = config['includes'].split()
     source_files = [str(p) for p in Path("src").rglob("*.cpp")]
-    
+
     bin_to_run = ""
     match mode:
         case BuildMode.BUILD:
@@ -168,8 +168,8 @@ def compileCman(mode: BuildMode):
         case BuildMode.DEBUG:
             bin_to_run = f"{config['build_dir']}/cman-debug"
             command = [config['cxx']] + cxx_flags + ["-g"] + includes + source_files + ["-o", bin_to_run]
-    
-    print(f"Compiling cman.....")
+
+    print("Compiling cman.....")
     ## do not capture output as compiler could generate some info.
     result = subprocess.run(command)
     status = result.returncode

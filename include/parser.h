@@ -35,8 +35,9 @@ namespace cman {
             bool build_project = false;
             bool run_bin = false;
             bool cli_args = false;
+            bool build_type_explicit = false;
+            bool mode_explicit = false;
             std::optional<std::string> bin_args;
-
         };
 
         //TODO: repetitive logic below.

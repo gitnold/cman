@@ -2,6 +2,7 @@
 #define CMAN_BUILD_H
 
 // #include "cli.h"
+#include <cstdlib>
 #include <expected>
 #include <optional>
 #include <string>
@@ -48,16 +49,27 @@ inline namespace v1 {
     //
     // TODO: capture project path on initialization for use in various stuff.
     struct BuildConfig{
-        BuildType build;
+        BuildType build = BuildType::SHELL_SCRIPT;
         std::string bin_path;
-        BuildMode mode;
+        BuildMode mode = BuildMode::DEFAULT;
         std::string project_name;
         std::string project_path;
-        Lang language;
+        Lang language = Lang::C;
         std::vector<std::string> arguments;
         std::string build_command;
         std::optional<std::vector<std::string>> tasks;
     };
+
+    // expand leading tilde to $HOME in paths
+    inline std::string expand_path(std::string path) {
+        if (!path.empty() && path[0] == '~') {
+            const char* home = std::getenv("HOME");
+            if (home) {
+                path.replace(0, 1, home);
+            }
+        }
+        return path;
+    }
 
     // global state to handle build details
     // TODO: remove inline def below, opt for references.

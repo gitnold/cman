@@ -40,23 +40,32 @@ inline namespace v1 {
                 
         // compile cman from source and install it, should support various build systems.
         bool compile_cman() {
-            std::string cman_path {UpdateConfig.cman_src_path + "/cman/"};
-            if (fs::exists(cman_path)) {
-                fs::current_path(cman_path);
-
-                // TODO: do some error handling.
-                std::system("git pull");
-
-            } else {
-                // move to the location first
-                // FIX: get status of shell commands first. 
-                fs::current_path(UpdateConfig.cman_src_path);
-                std::system(("git clone " + github_repo).c_str());
-                fs::current_path(cman_path);
+            try {
+                std::string cman_path = expand_path(UpdateConfig.cman_src_path + "/cman/");
+                if (fs::exists(cman_path)) {
+                    fs::current_path(cman_path);
+                    std::system("git pull");
+                } else {
+                    std::string src_path = expand_path(UpdateConfig.cman_src_path);
+                    if (!fs::exists(src_path)) {
+                        fs::create_directories(src_path);
+                    }
+                    fs::current_path(src_path);
+                    std::system(("git clone " + github_repo).c_str());
+                    if (fs::exists(cman_path)) {
+                        fs::current_path(cman_path);
+                    } else {
+                        cman::print_message("Failed to clone cman repository", ERROR);
+                        return false;
+                    }
+                }
+            } catch (const fs::filesystem_error& e) {
+                cman::print_message(e.what(), ERROR);
+                return false;
             }
             
-            cman::compile_bash();
-            return update_binary(UpdateConfig.cman_src_path + "bin/cman");
+            cman::compile_bash("cman");
+            return update_binary(expand_path(UpdateConfig.cman_src_path) + "bin/cman");
         }
         
         // updates the binary used by the system; downloads and puts it in path etc.
@@ -73,11 +82,21 @@ inline namespace v1 {
             
             // find a way of supporting custom paths for the destination
             #if defined (__linux__)
-                fs::copy(bin_src_path, LINUX_BIN_PATH); 
-                return true;
+                try {
+                    fs::copy(expand_path(bin_src_path), expand_path(LINUX_BIN_PATH));
+                    return true;
+                } catch (const fs::filesystem_error& e) {
+                    cman::print_message(e.what(), ERROR);
+                    return false;
+                }
             #elif defined(_WIN32)
-                fs::copy(bin_src_path, WINDOWS_BIN_PATH); 
-                return true;
+                try {
+                    fs::copy(expand_path(bin_src_path), expand_path(WINDOWS_BIN_PATH));
+                    return true;
+                } catch (const fs::filesystem_error& e) {
+                    cman::print_message(e.what(), ERROR);
+                    return false;
+                }
             #endif
             
             // possibly add mac support.

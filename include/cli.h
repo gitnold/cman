@@ -67,22 +67,22 @@ inline namespace v1 {
 
     class Config {
         public:
-            char** args;
+            std::vector<std::string> args;
             int num_of_args;
             std::string package_name;
             nlohmann::json global_config;
             nlohmann::json local_config;
             std::vector<Option> options;
 
-            Config(char** args, int number, LexMode mode);
+            Config(std::vector<std::string> args, LexMode mode);
             void parse();
             ~Config();
 
         private:
             bool parse_config();
             Option make_option(OptionType type, std::string value);
-            Option check_arg(const char* arg, char* value);
-            Option check_arg_map(const char* arg, char* value);
+            Option check_arg(const char* arg, const char* value);
+            Option check_arg_map(const char* arg, const char* value);
 
     };
 }}

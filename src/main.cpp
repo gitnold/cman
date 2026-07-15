@@ -7,8 +7,6 @@
 #include "semantic_analysis.h"
 
 
-//HACK: use a macro to define a debug control mode - use g++ -DEBUG to toggle debug mode.
-
 namespace cman {
 inline namespace v1 {
     void add_cli_option(std::string_view option) {
@@ -48,8 +46,12 @@ void cman::print_message(const char *message, cman::MessageType type) {
 
 int main(int argc, char** argv) {
     // TODO: make the lex mode dynamic.
+
+    std::vector<std::string> args(argv, argv + argc);
+
+
     auto lex_mode = cman::LexMode::CLI;
-    auto cli = cman::Config(argv, argc, lex_mode);
+    auto cli = cman::Config(args, lex_mode);
     cli.parse();
 
     //launch the evaluator.
@@ -61,8 +63,13 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    cman::SemanticAnalyzer semantic_analyzer = cman::SemanticAnalyzer(parser.parse_result);
-    if (semantic_analyzer.analyze() == cman::ResultType::OK) {
+    /// fixed confgi files missing.
+    std::optional<nlohmann::json> g_config = cli.global_config.is_null() ? std::nullopt : std::optional<nlohmann::json>(cli.global_config);
+    std::optional<nlohmann::json> l_config = cli.local_config.is_null() ? std::nullopt : std::optional<nlohmann::json>(cli.local_config);
+    cman::SemanticAnalyzer semantic_analyzer = cman::SemanticAnalyzer(parser.parse_result, g_config, l_config);
+    if (semantic_analyzer.analyze_configs() == cman::ResultType::OK &&
+        semantic_analyzer.analyze() == cman::ResultType::OK) {
+        /// -----------------------------------------
         semantic_analyzer.execute();
     }
     return EXIT_SUCCESS;

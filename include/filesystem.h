@@ -8,7 +8,7 @@ namespace cman {
     inline namespace v1 {
         int initialize_newbin_project(std::string project_name, const BuildConfig& config);
         void initialize_git();
-        void initialize_current_dir();
+        void initialize_current_dir(const BuildConfig& config);
         //void initialize_newlib_project();
     }
 

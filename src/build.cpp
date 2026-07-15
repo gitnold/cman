@@ -25,7 +25,7 @@ inline namespace v1 {
     //if nothing has changed then run binary else compile first.
     void run(std::string_view project_name) {
 
-        std::system(std::format("$BIN/{}", project_name).c_str());
+        std::system(std::format("./bin/{}", project_name).c_str());
     }
 
     //FIX: possible lifetime issue with using a reference.
@@ -33,11 +33,15 @@ inline namespace v1 {
 
         // try to move into the project root first before trying to build the project.
         try {
+            if (config.project_path.empty()) {
+                cman::print_message("Project path is not set, cannot build", ERROR);
+                return;
+            }
             fs::current_path(config.project_path) ;
 
         } catch (const fs::filesystem_error& e) {
             cman::print_message(e.what(), ERROR);
-
+            return;
         }
 
         switch (config.build) {
@@ -53,7 +57,8 @@ inline namespace v1 {
             case cman::BuildType::CMAKE:
                 try {
                     //TODO: try to create the build folder.
-                    fs::current_path(config.project_name + "/build/");
+                    fs::create_directories("./build/");
+                    fs::current_path("./build/");
                     std::system("cmake"); //TODO: add sane cmake defaults.
                 } catch (const fs::filesystem_error& e) {
                     cman::print_message(e.what(), ERROR);
@@ -84,7 +89,11 @@ inline namespace v1 {
                 shell_script << "gcc";
             }
 
-            shell_script << " ./src/*.cpp -o ./bin/" <<  config.project_name << " -Wall -Wextra\n";
+            /// use the correct source extension based on language
+            const char* src_ext = (config.language == Lang::CPP) ? "*.cpp" : "*.c";
+            shell_script << " ./src/" << src_ext << " -o ./bin/" <<  config.project_name << " -Wall -Wextra\n";
+            /// --------
+
             std::system("chmod +x build.sh");
             shell_script.close();
 
@@ -135,7 +144,9 @@ inline namespace v1 {
     }
 
     void FileStates::update_access_time(std::string filename) {
-        this->access_times.insert({filename, fs::last_write_time(filename)});
+        /// 
+        this->access_times.insert_or_assign(filename, fs::last_write_time(filename));
+        /// ---
     }
 
     //FIX: construct the hashmap from json correctly.

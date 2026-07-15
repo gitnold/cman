@@ -67,6 +67,14 @@ inline namespace v1 {
             this->action_list.push_back(ActionType::INIT_GIT);
         }
 
+        // if build/run is requested but no project was specified, use the current directory name
+        if ((parsed.build_project || parsed.run_bin) && build_config.project_name.empty()) {
+            build_config.project_name = fs::current_path().filename().string();
+        }
+        if (build_config.project_path.empty()) {
+            build_config.project_path = ".";
+        }
+
         // FIXED: added a has_value check to prevent UB.
         if (parsed.language.has_value() && !parsed.language->empty()) {
             std::string lang = *parsed.language;
@@ -98,11 +106,18 @@ inline namespace v1 {
             if (!build_ctx.buildtype_set) {
                 build_config.build = BuildType::SHELL_SCRIPT;
             }
+            if (!build_ctx.buildmode_set) {
+                build_config.mode = BuildMode::DEFAULT;
+            }
 
-            // setup the build config.
-            // use defaults as placeholders for now.
-            this->build_config.build = parsed.build_type;
-            this->build_config.mode = parsed.mode;
+            if (parsed.build_type_explicit) {
+                this->build_config.build = parsed.build_type;
+                build_ctx.buildtype_set = true;
+            }
+            if (parsed.mode_explicit) {
+                this->build_config.mode = parsed.mode;
+                build_ctx.buildmode_set = true;
+            }
 
             // --build or --run requires atleast --lang and --mode set, check this before building the build struct.
             // NOTE: build module already consumes the config struct, might as well pass the struct directly.
@@ -138,19 +153,96 @@ inline namespace v1 {
         return ResultType::OK;
     }
 
+
     ResultType SemanticAnalyzer::analyze_configs() {
         // precedence: cli > local > global.
-        // options to override: buildmode, buildtype, languag e
-        // TODO: have a way of knowing whether cli args were passed.
-    
-        //if there are no args/context fails and no config, then throw an error.
-        if (!this->l_config.has_value()) {
+        // options to override: buildmode, buildtype, language
+        // global config serves as the base, local config overrides it,
+        // and analyze() later overrides with explicit CLI args.
 
+        auto apply_config = [this](const json& cfg) {
+            if (cfg.contains("language") && cfg["language"].is_string()) {
+                std::string lang = cfg["language"];
+                for (auto& ch : lang) ch = std::tolower(ch);
+                if (lang == "c") {
+                    build_config.language = Lang::C;
+                    build_ctx.lang_set = true;
+                } else if (lang == "cpp" || lang == "c++" || lang == "cxx") {
+                    build_config.language = Lang::CPP;
+                    build_ctx.lang_set = true;
+                }
+            }
+
+            if (cfg.contains("build mode") && cfg["build mode"].is_string()) {
+                std::string mode = cfg["build mode"];
+                for (auto& ch : mode) ch = std::tolower(ch);
+                if (mode == "release") {
+                    build_config.mode = BuildMode::RELEASE;
+                    build_ctx.buildmode_set = true;
+                } else if (mode == "debug") {
+                    build_config.mode = BuildMode::DEBUG;
+                    build_ctx.buildmode_set = true;
+                } else if (mode == "default") {
+                    build_config.mode = BuildMode::DEFAULT;
+                    build_ctx.buildmode_set = true;
+                }
+            }
+
+            if (cfg.contains("build type") && cfg["build type"].is_string()) {
+                std::string type = cfg["build type"];
+                for (auto& ch : type) ch = std::tolower(ch);
+                if (type == "script" || type == "shell script") {
+                    build_config.build = BuildType::SHELL_SCRIPT;
+                    build_ctx.buildtype_set = true;
+                } else if (type == "make") {
+                    build_config.build = BuildType::MAKE;
+                    build_ctx.buildtype_set = true;
+                } else if (type == "cmake") {
+                    build_config.build = BuildType::CMAKE;
+                    build_ctx.buildtype_set = true;
+                }
+            }
+
+            if (cfg.contains("bin path") && cfg["bin path"].is_string()) {
+                build_config.bin_path = cfg["bin path"];
+                build_ctx.bin_path_set = true;
+            }
+
+            if (cfg.contains("project path") && cfg["project path"].is_string()) {
+                build_config.project_path = cfg["project path"];
+            }
+
+            if (cfg.contains("project name") && cfg["project name"].is_string()) {
+                build_config.project_name = cfg["project name"];
+                project_ctx.projectname_set = true;
+            }
+
+            if (cfg.contains("build command") && cfg["build command"].is_string()) {
+                build_config.build_command = cfg["build command"];
+            }
+
+            if (cfg.contains("tasks") && cfg["tasks"].is_array()) {
+                std::vector<std::string> tasks;
+                for (const auto& task : cfg["tasks"]) {
+                    if (task.is_string()) {
+                        tasks.push_back(task);
+                    }
+                }
+                if (!tasks.empty()) {
+                    build_config.tasks = tasks;
+                }
+            }
+        };
+
+        if (g_config.has_value() && !g_config->is_null()) {
+            apply_config(g_config.value());
         }
 
-        if (this->l_config.has_value()) {
-            // convert the json to a build config for analysis or just run the command.   
+        if (l_config.has_value() && !l_config->is_null()) {
+            apply_config(l_config.value());
         }
+
+        return ResultType::OK;
     }
 
 
@@ -174,7 +266,7 @@ inline namespace v1 {
                     break;
 
                 case cman::ActionType::INIT_PROJECT:
-                    initialize_current_dir();
+                    initialize_current_dir(this->build_config);
                     break;
 
                 case cman::ActionType::NEW_PROJECT:
