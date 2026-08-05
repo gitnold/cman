@@ -12,6 +12,8 @@
 
 namespace fs = std::filesystem;
 
+// FIX: add support for cman --clean in the parser and semantic analysis phase.
+
 namespace cman {
 inline namespace v1 {
     Config::Config(std::vector<std::string> args, [[maybe_unused]] LexMode mode){
@@ -54,7 +56,8 @@ inline namespace v1 {
             }
         }
     }
-
+    
+    [[deprecated("Moved to hash table implementation")]]
     Option Config::check_arg(const char* arg,  const char* value) {
         //Find whether a trie is more efficient for the giant if else toggle below or a hashset instead O(1) lookups.
         std::string value_new;
@@ -120,7 +123,7 @@ inline namespace v1 {
         auto option = known_options.find(arg);
 
         // if the option is not found check whether the user passed a short form of the option.
-        // if not a shorthand then it is an illegal token. 
+        // if not a shorthand then it is an illegal argument. 
         if (option == known_options.end()) {
             std::string short_arg {arg};
 

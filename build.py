@@ -112,10 +112,8 @@ def runIntegrationTests():
         tests_bin.mkdir(parents=True, exist_ok=True)
 
         for file in test_files:
-            # FIX: possible parsing bug below.
             print(f"Compiling test file : {file}")
 
-            #FIX: compile and name the binary as the filename without the extension.
             cxx_flags = config['cxx_flags'].split()
             includes = config['includes'].split()
             status = subprocess.run([config['cxx']] + cxx_flags + includes + [str(file), "-o", str(tests_bin / file.stem)]).returncode
@@ -129,7 +127,6 @@ def runIntegrationTests():
             test_bin = tests_bin / file.stem
             print(f"Running test.... {test_bin}")
 
-            #FIX: capturing output might impact tests that print to stdout thwmselves.
             output = subprocess.run([str(test_bin)])
             if output.returncode != 0:
                 print(f"Test {test_bin} failed!\n")

@@ -7,7 +7,6 @@
 
 namespace fs = std::filesystem;
 
-///fixes
 constexpr std::string_view CMAN_BIN_PATH {"bin/dev/cman-default"};
 constexpr std::array<std::string_view, 4> paths_to_check {
     "src/",
@@ -15,7 +14,7 @@ constexpr std::array<std::string_view, 4> paths_to_check {
     "include/",
     "debug/"
 };
-/// end of fix
+
 
 bool verify_project_structure() {
     auto current_path = fs::current_path();

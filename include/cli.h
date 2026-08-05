@@ -34,6 +34,7 @@ inline namespace v1 {
         VERSION,
         CLI_ARGS,
         BUILD_TYPE,
+        CLEAN,
         ILLEGAL
     };
 
@@ -59,8 +60,9 @@ inline namespace v1 {
       {"--lang", {OptionType::LANGUAGE, ""}},
       {"--update", {OptionType::UPDATE, ""}},
       {"--mode", {OptionType::MODE, ""}},
-      {"--version", {OptionType::VERSION, ""}},
-      {"--", {OptionType::CLI_ARGS,""}},
+     {"--version", {OptionType::VERSION, ""}},
+     {"--", {OptionType::CLI_ARGS,""}},
+     {"--clean", {OptionType::CLEAN, ""}}
     };
 
     std::optional<fs::path> find_local_config(fs::path start);
